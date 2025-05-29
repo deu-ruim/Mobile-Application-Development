@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "gs-2tdspm-elv",
-    "slug": "gs-2tdspm-elv",
+    "name": "deu-ruim",
+    "slug": "deu-ruim",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "deu-ruim",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -24,6 +25,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

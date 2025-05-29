@@ -1,21 +1,16 @@
-import { Stack } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 
 export default function Layout() {
   return (
     <Drawer
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
+        headerTitle: '',          // tira o título
+        headerShadowVisible: false,  // opcional, remove a sombra do header
       }}
     >
-      {/* Tela direta, assume app/home.js */}
-      <Drawer.Screen name="home" />
-
-      {/* Rota stack: assume app/stack/index.js + outras telas em app/stack/ */}
-      <Drawer.Screen
-        name="stack"
-        options={{ drawerLabel: 'Stack Screens' }}
-      />
+      <Drawer.Screen name="index" options={{ drawerLabel: 'Main' }} />
+      <Drawer.Screen name="telas" options={{ drawerLabel: 'Telas de Teste' }} />
     </Drawer>
   );
 }

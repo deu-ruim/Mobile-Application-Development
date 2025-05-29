@@ -1,12 +1,9 @@
 import { View, Text } from 'react-native';
-import { Link } from 'expo-router';
 
-export default function Root() {
+export default function MainScreen() {
   return (
-    <View>
-      <Link href="/home/messages">
-        <Text>Usando mais de uma navegação</Text>
-      </Link>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Página Principal (Main)</Text>
     </View>
   );
 }

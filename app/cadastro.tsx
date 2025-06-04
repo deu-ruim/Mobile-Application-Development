@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { isAxiosError } from 'axios';
-import api from '../src/api/api'; // ajuste o caminho se necessário
+import api from '../src/api/api'; 
 
 export default function Cadastro() {
   const [username, setUsername] = useState('');
@@ -52,7 +52,7 @@ export default function Cadastro() {
         </TouchableOpacity>
       </View>
 
-      <View style={{ marginVertical: 20 }}>
+      <View>
         <Text>Olá, Seja bem-vindo(a)</Text>
         <Text>Cadastro</Text>
       </View>
@@ -63,7 +63,6 @@ export default function Cadastro() {
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
-          style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
         />
         <TextInput
           placeholder="Email"
@@ -71,16 +70,14 @@ export default function Cadastro() {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
         />
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, marginBottom: 10 }}>
+        <View>
           <TextInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
-            style={{ flex: 1, padding: 8 }}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ paddingHorizontal: 10 }}>
             <Ionicons
@@ -97,20 +94,17 @@ export default function Cadastro() {
           onChangeText={setUf}
           autoCapitalize="characters"
           maxLength={2}
-          style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
         />
 
         <TouchableOpacity
-          onPress={handleCadastrar}
-          style={{ backgroundColor: 'red', padding: 12, alignItems: 'center', borderRadius: 5 }}
-        >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>Cadastrar</Text>
+          onPress={handleCadastrar}>
+          <Text>Cadastrar</Text>
         </TouchableOpacity>
 
-        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'center' }}>
+        <View>
           <Text>Você já tem conta?</Text>
           <TouchableOpacity onPress={() => router.push('/login')}>
-            <Text style={{ color: 'red' }}> Logar</Text>
+            <Text> Logar</Text>
           </TouchableOpacity>
         </View>
       </View>

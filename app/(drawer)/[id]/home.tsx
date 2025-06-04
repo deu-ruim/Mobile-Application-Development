@@ -116,11 +116,11 @@ import { View, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Lin
 import { useLocalSearchParams, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../../src/api/api';
-import { Usuario } from '../../../src/types/usuario'; // caminho para o tipo
+import { Usuario } from '../../../src/types/usuario'; 
 
 export default function Home() {
   const { id } = useLocalSearchParams();
-  const [usuario, setUsuario] = useState<Usuario | null>(null); // <<< aqui resolve
+  const [usuario, setUsuario] = useState<Usuario | null>(null); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

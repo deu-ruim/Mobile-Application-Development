@@ -43,14 +43,14 @@ export default function Login() {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
+    <ScrollView>
       <View>
         <TouchableOpacity onPress={() => router.push('/')}>
           <Ionicons name="chevron-back-outline" size={40} color="red" />
         </TouchableOpacity>
       </View>
 
-      <View style={{ marginVertical: 20 }}>
+      <View>
         <Text>Olá, Seja bem vindo(a) de volta!</Text>
         <Text>Login</Text>
       </View>
@@ -62,33 +62,30 @@ export default function Login() {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
         />
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, marginBottom: 10 }}>
+        <View>
           <TextInput
             placeholder="Senha"
             value={senha}
             onChangeText={setSenha}
             secureTextEntry={!showPassword}
-            style={{ flex: 1, padding: 8 }}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ paddingHorizontal: 10 }}>
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity
           onPress={handleLogin}
-          style={{ backgroundColor: 'red', padding: 12, alignItems: 'center', borderRadius: 5 }}
         >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>Logar</Text>
+          <Text>Logar</Text>
         </TouchableOpacity>
 
-        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'center' }}>
+        <View>
           <Text>Você não tem conta?</Text>
           <TouchableOpacity onPress={() => router.push('/cadastro')}>
-            <Text style={{ color: 'red' }}> Cadastre-se</Text>
+            <Text> Cadastre-se</Text>
           </TouchableOpacity>
         </View>
       </View>

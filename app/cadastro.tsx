@@ -45,7 +45,7 @@ export default function Cadastro() {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
+    <ScrollView>
       <View>
         <TouchableOpacity onPress={() => router.push('/')}>
           <Ionicons name="chevron-back-outline" size={40} color="red" />
@@ -79,7 +79,7 @@ export default function Cadastro() {
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ paddingHorizontal: 10 }}>
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? 'eye-outline' : 'eye-off-outline'}
               size={24}

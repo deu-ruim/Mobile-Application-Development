@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import { useEffect, useContext } from 'react';
+import { AuthContext } from '../../src/context/AuthContext';
 
 export default function Sair() {
-  const router = useRouter();
+  const { logout } = useContext(AuthContext);
 
   useEffect(() => {
-    router.replace('/')
+    logout(); 
   }, []);
 
-  return null;  
+  return null;
 }

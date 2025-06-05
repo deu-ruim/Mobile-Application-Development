@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Linking, Image } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { View, Text, ActivityIndicator, Alert, ScrollView, Image, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../../src/api/api';
-import { Usuario } from '../../../src/types/usuario'; // caminho para o tipo
+import { Usuario } from '../../../src/types/usuario'; 
 
 export default function PagUser() {
-  const { id } = useLocalSearchParams();
-  const [usuario, setUsuario] = useState<Usuario | null>(null); // <<< aqui resolve
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUsuario() {
       try {
         const token = await AsyncStorage.getItem('@token');
+        const userJson = await AsyncStorage.getItem('@user');
+        const user = userJson ? JSON.parse(userJson) : null;
+        const id = user?.id;
+
+
+        if (!token || !id) throw new Error('Token ou ID não encontrado');
+
         const response = await api.get(`/usuarios/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -28,8 +33,8 @@ export default function PagUser() {
       }
     }
 
-    if (id) fetchUsuario();
-  }, [id]);
+    fetchUsuario();
+  }, []);
 
   if (loading) {
     return (
@@ -54,21 +59,22 @@ export default function PagUser() {
         <Text>{usuario.username}!</Text>
         <Image source={require('../../../assets/pag-user/usuario.png')}/>
       </View>
+
       <View>
         <View>
           <Text>UserName</Text>
           <Text>{usuario.username}</Text>
         </View>
+
         <View>
           <Text>Email</Text>
           <Text>{usuario.email}</Text>
         </View>
+
         <View>
           <Text>UF</Text>
           <Text>{usuario.uf}</Text>
         </View>
-        {/* Aqui ainda não tem pq preciso q java atualize */}
-        
       </View>
     </ScrollView>
   );

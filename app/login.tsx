@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAxiosError } from 'axios';
-import api from '../src/api/api';
+import { AuthContext } from '../src/context/AuthContext';
 
 export default function Login() {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin() {
     if (!email || !senha) {
@@ -18,19 +19,10 @@ export default function Login() {
     }
 
     try {
-      const response = await api.post('/usuarios/login', {
-      email,
-      password: senha,
-      });
-
-      const { token} = response.data;
-      // const { token, usuario } = response.data;
-
-      await AsyncStorage.setItem('@token', token);
-      const idTemporario = 24
+      setLoading(true);
+      const user = await login(email, senha); 
       Alert.alert('Sucesso', 'Login realizado!');
-      // router.push(`/${usuario.id}/home`);
-      router.push(`/${idTemporario}/home`);
+      router.replace(`/${user.id}/home`);
     } catch (error) {
       if (isAxiosError(error)) {
         const msg = error.response?.data?.message || 'Email ou senha incorretos.';
@@ -39,55 +31,53 @@ export default function Login() {
         Alert.alert('Erro', 'Erro inesperado. Tente novamente.');
         console.error(error);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <ScrollView>
-      <View>
-        <TouchableOpacity onPress={() => router.push('/')}>
-          <Ionicons name="chevron-back-outline" size={40} color="red" />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={() => router.push('/')}>
+        <Ionicons name="chevron-back-outline" size={40} color="red" />
+      </TouchableOpacity>
 
-      <View>
-        <Text>Olá, Seja bem vindo(a) de volta!</Text>
-        <Text>Login</Text>
-      </View>
+      <Text>Olá, seja bem-vindo(a) de volta!</Text>
+      <Text>Login</Text>
+
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
       <View>
         <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          placeholder="Senha"
+          value={senha}
+          onChangeText={setSenha}
+          secureTextEntry={!showPassword}
         />
-
-        <View>
-          <TextInput
-            placeholder="Senha"
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity
-          onPress={handleLogin}
-        >
-          <Text>Logar</Text>
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} >
+          <Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
         </TouchableOpacity>
+      </View>
 
-        <View>
-          <Text>Você não tem conta?</Text>
-          <TouchableOpacity onPress={() => router.push('/cadastro')}>
-            <Text> Cadastre-se</Text>
-          </TouchableOpacity>
-        </View>
+      <TouchableOpacity onPress={handleLogin} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text>Logar</Text>
+        )}
+      </TouchableOpacity>
+
+      <View>
+        <Text>Você não tem conta?</Text>
+        <TouchableOpacity onPress={() => router.push('/cadastro')}>
+          <Text> Cadastre-se</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

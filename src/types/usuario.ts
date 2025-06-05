@@ -6,3 +6,10 @@ export interface Usuario {
   ativo: boolean;
   role?: string;
 }
+
+export interface JwtUser {
+  id: number;
+  role: string;
+  sub: string;
+  exp: number;
+};

@@ -1,0 +1,84 @@
+import React, { createContext, useEffect, useState, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { Alert } from 'react-native';
+import { jwtDecode } from 'jwt-decode';
+import api, { setToken as applyToken } from '../api/api';
+import { Usuario } from '../types/usuario';
+import { JwtUser } from '../types/usuario';
+
+interface AuthContextType {
+  user: Usuario | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<Usuario>;
+  logout: () => void;
+}
+
+export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<Usuario | null>(null);
+  const [token, setTokenState] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadStoredData = async () => {
+      const storedToken = await AsyncStorage.getItem('@token');
+      const storedUser = await AsyncStorage.getItem('@user');
+
+      if (storedToken && storedUser) {
+        setTokenState(storedToken);
+        setUser(JSON.parse(storedUser));
+        applyToken(storedToken);
+      }
+    };
+
+    loadStoredData();
+  }, []);
+
+  const login = async (email: string, password: string): Promise<Usuario> => {
+    const response = await api.post('/usuarios/login', { email, password });
+    const { token } = response.data;
+
+    if (!token) throw new Error('Token não retornado.');
+
+    const decoded: JwtUser = jwtDecode(token);
+    const userId = decoded.id;
+
+    // Busca os dados completos do usuário
+    const userResponse = await api.get(`/usuarios/${userId}`);
+    const usuarioCompleto: Usuario = userResponse.data;
+
+    await AsyncStorage.setItem('@token', token);
+    await AsyncStorage.setItem('@user', JSON.stringify(usuarioCompleto));
+
+    applyToken(token);
+    setTokenState(token);
+    setUser(usuarioCompleto);
+
+    return usuarioCompleto;
+  };
+
+  const logout = async () => {
+    await AsyncStorage.multiRemove(['@token', '@user']);
+    applyToken(null);
+    setUser(null);
+    setTokenState(null);
+    Alert.alert('Sessão encerrada', 'Você foi deslogado com sucesso.');
+    router.replace('/');
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!user && !!token,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};

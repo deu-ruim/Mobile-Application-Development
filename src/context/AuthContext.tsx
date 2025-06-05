@@ -39,23 +39,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<Usuario> => {
     const response = await api.post('/usuarios/login', { email, password });
     const { token } = response.data;
-
+    
     if (!token) throw new Error('Token não retornado.');
-
+    
     const decoded: JwtUser = jwtDecode(token);
     const userId = decoded.id;
-
-    // Busca os dados completos do usuário
+    
+    applyToken(token); 
+    setTokenState(token);
+    
     const userResponse = await api.get(`/usuarios/${userId}`);
     const usuarioCompleto: Usuario = userResponse.data;
-
+    
     await AsyncStorage.setItem('@token', token);
     await AsyncStorage.setItem('@user', JSON.stringify(usuarioCompleto));
-
-    applyToken(token);
-    setTokenState(token);
+    
     setUser(usuarioCompleto);
-
+    
     return usuarioCompleto;
   };
 

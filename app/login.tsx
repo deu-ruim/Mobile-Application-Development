@@ -19,6 +19,7 @@ export default function Login() {
     }
 
     try {
+      
       setLoading(true);
       const user = await login(email, senha); 
       Alert.alert('Sucesso', 'Login realizado!');

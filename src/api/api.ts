@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+//http://192.168.10.158:8080/api
+
 const api = axios.create({
   baseURL: 'http://192.168.10.158:8080/api',
   timeout: 5000,

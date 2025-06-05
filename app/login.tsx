@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { isAxiosError } from 'axios';
 import { AuthContext } from '../src/context/AuthContext';
+import { GlobalStyles } from '../src/styles/global';
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -37,46 +38,50 @@ export default function Login() {
   }
 
   return (
-    <ScrollView>
+    <ScrollView style={GlobalStyles.formulario}>
       <TouchableOpacity onPress={() => router.push('/')}>
         <Ionicons name="chevron-back-outline" size={40} color="red" />
       </TouchableOpacity>
 
-      <Text>Olá, seja bem-vindo(a) de volta!</Text>
-      <Text>Login</Text>
+      <Text style={GlobalStyles.textForms}>Olá, seja bem-vindo(a) de volta!</Text>
+      <Text style={GlobalStyles.textForms}>Login</Text>
 
       <TextInput
         placeholder="Email"
+        style={GlobalStyles.caixa}
+        placeholderTextColor="#4D4D4D"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
 
-      <View>
+      <View style={[GlobalStyles.caixa, { flexDirection: 'row', justifyContent: 'space-between' }]}>
         <TextInput
           placeholder="Senha"
+          style={[{ fontSize: 20, }]}
           value={senha}
+          placeholderTextColor="#4D4D4D"
           onChangeText={setSenha}
           secureTextEntry={!showPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)} >
-          <Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
+          <Ionicons style={[{ justifyContent:'center', padding:10 }]} name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={handleLogin} disabled={loading}>
+      <TouchableOpacity style={GlobalStyles.botao} onPress={handleLogin} disabled={loading}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text>Logar</Text>
+          <Text style={[GlobalStyles.text, { color: 'white' }]}>Logar</Text>
         )}
       </TouchableOpacity>
 
-      <View>
-        <Text>Você não tem conta?</Text>
+      <View style={[{ flexDirection: 'row', paddingLeft: 40, paddingTop: 20 }]}>
+        <Text style={[GlobalStyles.textinho, { color: 'white' }]}>Você não tem conta?</Text>
         <TouchableOpacity onPress={() => router.push('/cadastro')}>
-          <Text> Cadastre-se</Text>
+          <Text style={[GlobalStyles.textinho, { color: '#EA003D' }]}> Cadastre-se</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

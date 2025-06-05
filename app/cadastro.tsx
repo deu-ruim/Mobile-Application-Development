@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { isAxiosError } from 'axios';
 import api from '../src/api/api'; 
+import { GlobalStyles } from '../src/styles/global';
 
 export default function Cadastro() {
   const [username, setUsername] = useState('');
@@ -45,7 +46,7 @@ export default function Cadastro() {
   }
 
   return (
-    <ScrollView>
+    <ScrollView style={GlobalStyles.formulario}>
       <View>
         <TouchableOpacity onPress={() => router.push('/')}>
           <Ionicons name="chevron-back-outline" size={40} color="red" />
@@ -53,34 +54,41 @@ export default function Cadastro() {
       </View>
 
       <View>
-        <Text>Olá, Seja bem-vindo(a)</Text>
-        <Text>Cadastro</Text>
+        <Text style={GlobalStyles.textForms}>Olá, Seja bem-vindo(a)</Text>
+        <Text style={GlobalStyles.textForms}>Cadastro</Text>
       </View>
 
       <View>
         <TextInput
           placeholder="Username"
+          style={GlobalStyles.caixa}
+          placeholderTextColor="#4D4D4D"
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
         />
         <TextInput
           placeholder="Email"
+          style={GlobalStyles.caixa}
+          placeholderTextColor="#4D4D4D"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        <View>
+        <View style={[GlobalStyles.caixa, { flexDirection: 'row', justifyContent: 'space-between' }]}>
           <TextInput
             placeholder="Password"
+            style={[{ fontSize: 20, }]}
+            placeholderTextColor="#4D4D4D"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
+              style={[{ justifyContent:'center', padding:10 }]}
               name={showPassword ? 'eye-outline' : 'eye-off-outline'}
               size={24}
               color="gray"
@@ -90,6 +98,8 @@ export default function Cadastro() {
 
         <TextInput
           placeholder="UF"
+          style={GlobalStyles.caixa}
+          placeholderTextColor="#4D4D4D"
           value={uf}
           onChangeText={setUf}
           autoCapitalize="characters"
@@ -97,14 +107,15 @@ export default function Cadastro() {
         />
 
         <TouchableOpacity
+          style={[GlobalStyles.botao, { marginTop: 150, }]}
           onPress={handleCadastrar}>
-          <Text>Cadastrar</Text>
+          <Text style={[GlobalStyles.text, { color: 'white' }]}>Cadastrar</Text>
         </TouchableOpacity>
 
-        <View>
-          <Text>Você já tem conta?</Text>
+        <View style={[{ flexDirection: 'row', paddingLeft: 70, paddingTop: 20 }]}>
+          <Text style={[GlobalStyles.textinho, { color: 'white' }]}>Você já tem conta?</Text>
           <TouchableOpacity onPress={() => router.push('/login')}>
-            <Text> Logar</Text>
+            <Text style={[GlobalStyles.textinho, { color: '#EA003D' }]}> Logar</Text>
           </TouchableOpacity>
         </View>
       </View>

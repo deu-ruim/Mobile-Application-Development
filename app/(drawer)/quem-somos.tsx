@@ -18,32 +18,32 @@ export default function Home() {
   }, []);
   
   return (
-    <ScrollView>
-      <View>
-        <Text>Quem somos!</Text>
-        <Text>Fiap</Text>
+    <ScrollView contentContainerStyle={GlobalStyles.somos}>
+      <View style={[{ paddingBottom: 50, }]}>
+        <Text style={[GlobalStyles.textSomos, { color: 'white', }]}>Quem somos!</Text>
+        <Text style={[GlobalStyles.textSomos, { color: '#EA003D' }]}>Fiap</Text>
       </View>
-      <View>
+      <View style={GlobalStyles.imagens}>
         <View>
-          <Image source={require('../../assets/sobre-nos/erick-img.png')}/>
+          <Image source={require('./assets/sobre-nos/erick-img.png')}/>
         </View>
         <View>
-          <Text>Erick Alves</Text>
-          <Text>RM 556862</Text>
-          <Text>2TDSPM</Text>
-          <View>
+          <Text style={[GlobalStyles.textSomos, { color: 'white', }]}>Erick Alves</Text>
+          <Text style={[GlobalStyles.textinho, { color: '#494949', }]}>RM 556862</Text>
+          <Text style={[GlobalStyles.textinho, { color: '#494949', }]}>2TDSPM</Text>
+          <View style={GlobalStyles.links}>
             <TouchableOpacity onPress={() => Linking.openURL('https://github.com/Erick0105')}>
-              <Ionicons name="logo-github" size={20} color="black" />          
+              <Ionicons name="logo-github" size={30} color="white" />          
             </TouchableOpacity>
             <TouchableOpacity onPress={() => Linking.openURL('https://www.linkedin.com/in/erick-alves-295180235/')}>
-              <Ionicons name="logo-linkedin" size={20} color="black" />
+              <Ionicons name="logo-linkedin" size={30} color="white" />
             </TouchableOpacity>
           </View>
         </View>
       </View>
       <View>
         <View>
-          <Image source={require('../../assets/sobre-nos/vicenzo-img.png')}/>
+          <Image source={require('./assets/sobre-nos/vicenzo-img.png')}/>
         </View>
         <View>
           <Text>Vicenzo Massao</Text>
@@ -61,7 +61,7 @@ export default function Home() {
       </View>
       <View>
         <View>
-          <Image source={require('../../assets/sobre-nos/luiz-img.png')}/>
+          <Image source={require('./assets/sobre-nos/luiz-img.png')}/>
         </View>
         <View>
           <Text>Luiz Henrique Neri</Text>

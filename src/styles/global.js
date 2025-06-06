@@ -16,10 +16,22 @@ export const GlobalStyles = StyleSheet.create({
     paddingVertical: 80,
     backgroundColor: '#262626',
   },
+  somos: {
+    padding: 20,
+    paddingVertical: 80,
+    backgroundColor: '#262626',
+  },
   text: {
     fontFamily: 'Lemon-Regular',
     fontSize: 20,
     textAlign: 'center',
+  },
+  textSomos: {
+    fontFamily: 'Lemon-Regular',
+    fontWeight: 'semibold',
+    fontSize: 25,
+    textAlign: 'center',  
+    
   },
   textinho: {
     fontFamily: 'Lemon-Regular',
@@ -57,5 +69,14 @@ export const GlobalStyles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     marginTop: 200,
+  },
+  imagens: {
+    flexDirection: 'row',
+    gap:20
+  },
+  links: {
+    flexDirection: 'row',
+    paddingTop: 10,
+    gap:30
   },
 });

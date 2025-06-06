@@ -41,7 +41,7 @@ export default function Login() {
   return (
     <ScrollView style={GlobalStyles.formulario}>
       <TouchableOpacity onPress={() => router.push('/')}>
-        <Ionicons name="chevron-back-outline" size={40} color="red" />
+        <Ionicons name="chevron-back-outline" size={40} color="#EA003D" />
       </TouchableOpacity>
 
       <Text style={GlobalStyles.textForms}>Olá, seja bem-vindo(a) de volta!</Text>

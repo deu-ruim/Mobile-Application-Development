@@ -60,12 +60,14 @@ export default function CriarDesastre() {
   };
 
   return (
-    <ScrollView>
-      <Text>Cadastrar Desastre</Text>
+    <ScrollView style={GlobalStyles.formulario}>
+      <Text style={GlobalStyles.textForms}>Cadastrar Desastre</Text>
 
       <Text>UF</Text>
       <TextInput
         placeholder="Ex: SP"
+        style={GlobalStyles.caixa}
+        placeholderTextColor="#4D4D4D"
         value={uf}
         onChangeText={setUf}
         autoCapitalize="characters"
@@ -73,17 +75,21 @@ export default function CriarDesastre() {
       />
 
       <Text>Título</Text>
-      <TextInput value={titulo} onChangeText={setTitulo} />
+      <TextInput value={titulo} onChangeText={setTitulo} style={GlobalStyles.caixa} placeholderTextColor="#4D4D4D"/>
 
       <Text>Descrição</Text>
       <TextInput
         multiline
+        placeholderTextColor="#4D4D4D"
+        style={GlobalStyles.caixa}
         value={descricao}
         onChangeText={setDescricao}
       />
 
       <Text>Severidade</Text>
       <Picker
+        style={GlobalStyles.caixa}
+        placeholderTextColor="#fff"
         selectedValue={severidade}
         onValueChange={(itemValue: string) =>
           setSeveridade(itemValue as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL')

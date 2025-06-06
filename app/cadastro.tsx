@@ -49,7 +49,7 @@ export default function Cadastro() {
     <ScrollView style={GlobalStyles.formulario}>
       <View>
         <TouchableOpacity onPress={() => router.push('/')}>
-          <Ionicons name="chevron-back-outline" size={40} color="red" />
+          <Ionicons name="chevron-back-outline" size={40} color="#EA003D" />
         </TouchableOpacity>
       </View>
 

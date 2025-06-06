@@ -26,7 +26,7 @@ export default function Home() {
       </View>
       <View style={GlobalStyles.imagens}>
         <View>
-          <Image source={require('./assets/sobre-nos/erick-img.png')}/>
+          <Image source={require('../../assets/sobre-nos/erick-img.png')}/>
         </View>
         <View style={GlobalStyles.informacoes}>
           <Text style={[GlobalStyles.text, { color: 'white', }]}>Erick Alves</Text>
@@ -44,7 +44,7 @@ export default function Home() {
       </View>
       <View style={[GlobalStyles.imagens, { marginTop: 30, }]}>
         <View>
-          <Image source={require('./assets/sobre-nos/vicenzo-img.png')}/>
+          <Image source={require('../../assets/sobre-nos/vicenzo-img.png')}/>
         </View>
         <View style={[GlobalStyles.informacoes, { height: 130, marginTop: 30, }]}>
           <Text style={[GlobalStyles.text, { color: 'white', }]}>Vicenzo Massao</Text>
@@ -62,7 +62,7 @@ export default function Home() {
       </View>
       <View style={[GlobalStyles.imagens, { marginTop: 80, }]}>
         <View>
-          <Image source={require('./assets/sobre-nos/luiz-img.png')}/>
+          <Image source={require('../../assets/sobre-nos/luiz-img.png')}/>
         </View>
         <View style={GlobalStyles.informacoes}>
           <Text style={[GlobalStyles.text, { color: 'white', }]}>Luiz Henrique Neri</Text>

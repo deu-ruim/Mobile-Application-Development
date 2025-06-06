@@ -24,6 +24,7 @@ export const GlobalStyles = StyleSheet.create({
     backgroundColor: '#2F2F2F',
   },
   somos: {
+    flex:1,
     padding: 20,
     paddingVertical: 80,
     backgroundColor: '#262626',

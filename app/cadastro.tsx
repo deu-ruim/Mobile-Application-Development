@@ -6,6 +6,36 @@ import { isAxiosError } from 'axios';
 import api from '../src/api/api'; 
 import { GlobalStyles } from '../src/styles/global';
 
+const UFS = [
+  { sigla: 'AC', nome: 'Acre' },
+  { sigla: 'AL', nome: 'Alagoas' },
+  { sigla: 'AP', nome: 'Amapá' },
+  { sigla: 'AM', nome: 'Amazonas' },
+  { sigla: 'BA', nome: 'Bahia' },
+  { sigla: 'CE', nome: 'Ceará' },
+  { sigla: 'DF', nome: 'Distrito Federal' },
+  { sigla: 'ES', nome: 'Espírito Santo' },
+  { sigla: 'GO', nome: 'Goiás' },
+  { sigla: 'MA', nome: 'Maranhão' },
+  { sigla: 'MT', nome: 'Mato Grosso' },
+  { sigla: 'MS', nome: 'Mato Grosso do Sul' },
+  { sigla: 'MG', nome: 'Minas Gerais' },
+  { sigla: 'PA', nome: 'Pará' },
+  { sigla: 'PB', nome: 'Paraíba' },
+  { sigla: 'PR', nome: 'Paraná' },
+  { sigla: 'PE', nome: 'Pernambuco' },
+  { sigla: 'PI', nome: 'Piauí' },
+  { sigla: 'RJ', nome: 'Rio de Janeiro' },
+  { sigla: 'RN', nome: 'Rio Grande do Norte' },
+  { sigla: 'RS', nome: 'Rio Grande do Sul' },
+  { sigla: 'RO', nome: 'Rondônia' },
+  { sigla: 'RR', nome: 'Roraima' },
+  { sigla: 'SC', nome: 'Santa Catarina' },
+  { sigla: 'SP', nome: 'São Paulo' },
+  { sigla: 'SE', nome: 'Sergipe' },
+  { sigla: 'TO', nome: 'Tocantins' },
+];
+
 export default function Cadastro() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -13,6 +43,16 @@ export default function Cadastro() {
   const [uf, setUf] = useState('');
   const [ativo] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [ufDropdownOpen, setUfDropdownOpen] = useState(false);
+
+  function toggleDropdown() {
+    setUfDropdownOpen(!ufDropdownOpen);
+  }
+
+  function selecionarUf(sigla: string) {
+    setUf(sigla);
+    setUfDropdownOpen(false);
+  }
 
   async function handleCadastrar() {
     if (!username || !email || !password || !uf) {
@@ -46,7 +86,7 @@ export default function Cadastro() {
   }
 
   return (
-    <ScrollView style={GlobalStyles.formulario}>
+    <ScrollView style={GlobalStyles.formulario} keyboardShouldPersistTaps="handled">
       <View>
         <TouchableOpacity onPress={() => router.push('/')}>
           <Ionicons name="chevron-back-outline" size={40} color="#EA003D" />
@@ -80,7 +120,7 @@ export default function Cadastro() {
         <View style={[GlobalStyles.caixa, { flexDirection: 'row', justifyContent: 'space-between' }]}>
           <TextInput
             placeholder="Password"
-            style={[{ fontSize: 20, }]}
+            style={[{ fontSize: 20 }]}
             placeholderTextColor="#4D4D4D"
             value={password}
             onChangeText={setPassword}
@@ -88,7 +128,7 @@ export default function Cadastro() {
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
-              style={[{ justifyContent:'center', padding:10 }]}
+              style={[{ justifyContent: 'center', padding: 10 }]}
               name={showPassword ? 'eye-outline' : 'eye-off-outline'}
               size={24}
               color="gray"
@@ -96,23 +136,42 @@ export default function Cadastro() {
           </TouchableOpacity>
         </View>
 
-        <TextInput
-          placeholder="UF"
-          style={GlobalStyles.caixa}
-          placeholderTextColor="#4D4D4D"
-          value={uf}
-          onChangeText={setUf}
-          autoCapitalize="characters"
-          maxLength={2}
-        />
+        <TouchableOpacity
+          onPress={toggleDropdown}
+          style={[GlobalStyles.caixa, { justifyContent: 'center' }]}
+        >
+          <Text style={{ color: uf ? '#000' : '#999' }}>
+            {uf ? UFS.find((item) => item.sigla === uf)?.nome : 'Selecione o estado'}
+          </Text>
+          <Ionicons
+            name={ufDropdownOpen ? 'chevron-up-outline' : 'chevron-down-outline'}
+            size={20}
+            color="#333"
+          />
+        </TouchableOpacity>
+
+        {ufDropdownOpen && (
+          <ScrollView nestedScrollEnabled={true}>
+            {UFS.map((item) => (
+              <TouchableOpacity
+                key={item.sigla}
+                onPress={() => selecionarUf(item.sigla)}>
+                <Text>
+                  {item.nome}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
 
         <TouchableOpacity
-          style={[GlobalStyles.botao, { marginTop: 150, }]}
-          onPress={handleCadastrar}>
+          style={[GlobalStyles.botao, { marginTop: 150 }]}
+          onPress={handleCadastrar}
+        >
           <Text style={[GlobalStyles.text, { color: 'white' }]}>Cadastrar</Text>
         </TouchableOpacity>
 
-        <View style={[{ flexDirection: 'row', paddingLeft: 70, paddingTop: 20 }]}>
+        <View style={{ flexDirection: 'row', paddingLeft: 70, paddingTop: 20 }}>
           <Text style={[GlobalStyles.textinho, { color: 'white' }]}>Você já tem conta?</Text>
           <TouchableOpacity onPress={() => router.push('/login')}>
             <Text style={[GlobalStyles.textinho, { color: '#EA003D' }]}> Logar</Text>

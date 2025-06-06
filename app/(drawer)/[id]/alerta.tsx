@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, LayoutAnimation, UIManager, Platform } from 'react-native';
-import api from '../../../src/api/api'; 
+import {View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, LayoutAnimation} from 'react-native';
+import api from '../../../src/api/api';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Desastre } from '../../../src/types/desastre';
 import { Ionicons } from '@expo/vector-icons';
 
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 interface Usuario {
   id: number;
@@ -19,12 +16,22 @@ interface Usuario {
   role?: string;
 }
 
+const SEVERIDADES = [
+  'NON_DESTRUCTIVE',
+  'LOW',
+  'MODERATE',
+  'HIGH',
+  'CRITICAL',
+  'CATASTROPHIC',
+] as const;
+
 export default function Alerta() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [loadingUsuario, setLoadingUsuario] = useState(true);
   const [desastres, setDesastres] = useState<Desastre[]>([]);
   const [carregandoDesastres, setCarregandoDesastres] = useState(true);
-  const [expandido, setExpandido] = useState<number | null>(null); 
+  const [expandido, setExpandido] = useState<number | null>(null);
+  const [filtroSeveridade, setFiltroSeveridade] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUsuario() {
@@ -55,12 +62,26 @@ export default function Alerta() {
   }, []);
 
   useEffect(() => {
-    async function carregarTodosDesastres() {
+    async function carregarDesastres() {
       if (!usuario) return;
 
       setCarregandoDesastres(true);
+
       try {
-        const resposta = await api.get(`/desastres?uf=${usuario.uf}`);
+        const token = await AsyncStorage.getItem('@token');
+
+        // Monta a query string com uf e severidade se tiver filtro
+        let url = `/desastres?uf=${usuario.uf}`;
+        if (filtroSeveridade) {
+          url += `&severidade=${filtroSeveridade}`;
+        }
+
+        const resposta = await api.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         const dados = resposta.data;
         const lista = Array.isArray(dados.content) ? dados.content : dados;
         setDesastres(lista);
@@ -72,8 +93,40 @@ export default function Alerta() {
       }
     }
 
-    carregarTodosDesastres();
-  }, [usuario]);
+    carregarDesastres();
+  }, [usuario, filtroSeveridade]);
+
+  function toggleExpandir(id: number) {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandido(expandido === id ? null : id);
+  }
+
+  async function handleExcluirDesastre(id: number) {
+    Alert.alert(
+      'Confirmar exclusão',
+      'Tem certeza que deseja excluir este desastre?',
+      [
+        { text: 'Cancelar'},
+        {
+          text: 'Excluir',
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('@token');
+              await api.delete(`/desastres/${id}`, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+              setDesastres((prev) => prev.filter((d) => d.id !== id));
+            } catch (error) {
+              Alert.alert('Erro', 'Não foi possível excluir o desastre.');
+              console.error(error);
+            }
+          },
+        },
+      ]
+    );
+  }
 
   if (loadingUsuario || carregandoDesastres) {
     return (
@@ -87,50 +140,55 @@ export default function Alerta() {
   if (desastres.length === 0) {
     return (
       <View>
-              {usuario?.role === 'ADMIN' && (
-        <TouchableOpacity
-          onPress={() => router.push('../../criarDesastre')}>
-          <Text>
-            Criar um desastre
-          </Text>
-        </TouchableOpacity>
-      )}
-        <Text>Nenhum desastre encontrado.</Text>
+        {usuario?.role === 'ADMIN' && (
+          <TouchableOpacity onPress={() => router.push('../../criarDesastre')}>
+            <Text>Criar um desastre</Text>
+          </TouchableOpacity>
+        )}
+        <Text>Nenhum desastre encontrado na região de {usuario?.uf}.</Text>
       </View>
     );
   }
 
-  function toggleExpandir(id: number) {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpandido(expandido === id ? null : id);
-  }
-
   return (
-    <View >
+    <View>
       <Text>Alerta!!!</Text>
-      <Text>Só aparecem desastres do seu estado</Text>
+      <Text>Desastres da região {usuario?.uf}</Text>
 
       {usuario?.role === 'ADMIN' && (
-        <TouchableOpacity
-          onPress={() => router.push('../../criarDesastre')}>
+        <TouchableOpacity onPress={() => router.push('../../criarDesastre')}>
           <Text>Criar Desastre</Text>
         </TouchableOpacity>
       )}
+
+      <View>
+        <TouchableOpacity onPress={() => setFiltroSeveridade(null)}>
+          <Text>Todos</Text>
+        </TouchableOpacity>
+
+        {SEVERIDADES.map((sev) => (
+          <TouchableOpacity
+            key={sev}
+            onPress={() => setFiltroSeveridade(sev)}>
+            <Text>{sev}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <FlatList
         data={desastres}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
           const aberto = expandido === item.id;
+
           return (
-            <TouchableOpacity
-              onPress={() => toggleExpandir(item.id)}>
-              <Ionicons name="earth-outline" size={40} color="red" />
-              <Text>{item.titulo}</Text>
-              <Ionicons name="warning-outline" size={40} color="red" />
-              <Text>Severidade: {item.severidade}</Text>
-              <Ionicons name="location-outline" size={40} color="red" />
-              <Text>UF: {item.uf}</Text>
+            <TouchableOpacity onPress={() => toggleExpandir(item.id)}>
+              <View>
+                <Ionicons name="earth-outline" size={40} color="red" />
+                <Text>{item.titulo}</Text>
+                <Ionicons name="warning-outline" size={40} color="red" />
+                <Text>{item.severidade}</Text>
+              </View>
 
               {aberto && (
                 <View>
@@ -140,6 +198,12 @@ export default function Alerta() {
                   <Text>Criado em: {new Date(item.createdAt).toLocaleString()}</Text>
                   <Ionicons name="person-circle-outline" size={40} color="red" />
                   <Text>Feito por: {item.usuario.username}</Text>
+
+                  {usuario?.role === 'ADMIN' && (
+                    <TouchableOpacity onPress={() => handleExcluirDesastre(item.id)}>
+                      <Ionicons name="trash-outline" size={30} color="red" />
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
             </TouchableOpacity>

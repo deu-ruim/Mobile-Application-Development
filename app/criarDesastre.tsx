@@ -4,13 +4,16 @@ import { Picker } from '@react-native-picker/picker';
 import { AuthContext } from '../src/context/AuthContext';
 import api from '../src/api/api';
 import { router } from 'expo-router';
+import { GlobalStyles } from '../src/styles/global';
+
+type Severidade = 'NON_DESTRUCTIVE' | 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL' | 'CATASTROPHIC';
 
 export default function CriarDesastre() {
   const { user, token } = useContext(AuthContext);
   const [uf, setUf] = useState('');
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [severidade, setSeveridade] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('LOW');
+  const [severidade, setSeveridade] = useState<Severidade>('LOW');
 
   const handleCadastrar = async () => {
     if (!uf || !titulo || !descricao) {
@@ -24,9 +27,6 @@ export default function CriarDesastre() {
     }
 
     try {
-      console.log('Token:', token);
-      console.log({ uf, titulo, descricao, severidade, usuarioId: user.id });
-
       const response = await api.post(
         '/desastres',
         {
@@ -44,7 +44,7 @@ export default function CriarDesastre() {
       );
 
       Alert.alert('Sucesso', 'Desastre cadastrado com sucesso!');
-      router.push(`/${user.id}/home`);
+      router.push(`/${user.id}/alerta`);
     } catch (error: any) {
       if (error.response) {
         console.error('Erro no servidor:', error.response.data);
@@ -89,16 +89,15 @@ export default function CriarDesastre() {
       <Text>Severidade</Text>
       <Picker
         style={GlobalStyles.caixa}
-        placeholderTextColor="#fff"
         selectedValue={severidade}
-        onValueChange={(itemValue: string) =>
-          setSeveridade(itemValue as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL')
-        }
+        onValueChange={(itemValue: Severidade) => setSeveridade(itemValue)}
       >
+        <Picker.Item label="Não destrutivo" value="NON_DESTRUCTIVE" />
         <Picker.Item label="Baixa" value="LOW" />
-        <Picker.Item label="Média" value="MEDIUM" />
+        <Picker.Item label="Moderada" value="MODERATE" />
         <Picker.Item label="Alta" value="HIGH" />
         <Picker.Item label="Crítica" value="CRITICAL" />
+        <Picker.Item label="Catastrófica" value="CATASTROPHIC" />
       </Picker>
 
       <View>

@@ -10,7 +10,11 @@ export const GlobalStyles = StyleSheet.create({
     padding: 60,
     paddingVertical: 80,
     backgroundColor: '#262626',
-
+  },
+  fundo: {
+    padding: 60,
+    paddingVertical: 80,
+    backgroundColor: '#262626',
   },
   text: {
     fontFamily: 'Lemon-Regular',

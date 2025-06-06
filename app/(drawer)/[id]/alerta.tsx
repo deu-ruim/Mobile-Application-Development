@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, LayoutAnimation, UIManager, Platform } from 'react-native';
 import api from '../../../src/api/api'; 
+import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Desastre } from '../../../src/types/desastre';
 import { Ionicons } from '@expo/vector-icons';
@@ -86,6 +87,14 @@ export default function Alerta() {
   if (desastres.length === 0) {
     return (
       <View>
+              {usuario?.role === 'ADMIN' && (
+        <TouchableOpacity
+          onPress={() => router.push('../../criarDesastre')}>
+          <Text>
+            Criar um desastre
+          </Text>
+        </TouchableOpacity>
+      )}
         <Text>Nenhum desastre encontrado.</Text>
       </View>
     );
@@ -99,6 +108,15 @@ export default function Alerta() {
   return (
     <View >
       <Text>Alerta!!!</Text>
+      <Text>Só aparecem desastres do seu estado</Text>
+
+      {usuario?.role === 'ADMIN' && (
+        <TouchableOpacity
+          onPress={() => router.push('../../criarDesastre')}>
+          <Text>Criar Desastre</Text>
+        </TouchableOpacity>
+      )}
+
       <FlatList
         data={desastres}
         keyExtractor={(item) => item.id.toString()}

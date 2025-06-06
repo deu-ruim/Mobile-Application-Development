@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx (exemplo)
 import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
@@ -15,6 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<Usuario>;
   logout: () => void;
   updateUser: (updatedFields: Partial<Usuario>) => Promise<void>;
+  setToken: (token: string | null) => void;  
 }
 
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -22,6 +22,11 @@ export const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<Usuario | null>(null);
   const [token, setTokenState] = useState<string | null>(null);
+
+  const setToken = (token: string | null) => {
+    setTokenState(token);
+    applyToken(token); 
+  };
 
   useEffect(() => {
     const loadStoredData = async () => {
@@ -47,8 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const decoded: JwtUser = jwtDecode(token);
     const userId = decoded.id;
 
-    applyToken(token);
-    setTokenState(token);
+    setToken(token); 
 
     const userResponse = await api.get(`/usuarios/${userId}`);
     const usuarioCompleto: Usuario = userResponse.data;
@@ -63,9 +67,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     await AsyncStorage.multiRemove(['@token', '@user']);
-    applyToken(null);
+    setToken(null);
     setUser(null);
-    setTokenState(null);
     Alert.alert('Sessão encerrada', 'Você foi deslogado com sucesso.');
     router.replace('/');
   };
@@ -98,6 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         updateUser,
+        setToken,
       }}
     >
       {children}

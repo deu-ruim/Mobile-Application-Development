@@ -16,6 +16,13 @@ export const GlobalStyles = StyleSheet.create({
     paddingVertical: 80,
     backgroundColor: '#262626',
   },
+  informacoes: {
+    paddingVertical:10,
+    width:200,
+    borderBottomEndRadius: 20,
+    borderTopRightRadius: 20,
+    backgroundColor: '#2F2F2F',
+  },
   somos: {
     padding: 20,
     paddingVertical: 80,
@@ -72,10 +79,10 @@ export const GlobalStyles = StyleSheet.create({
   },
   imagens: {
     flexDirection: 'row',
-    gap:20
   },
   links: {
     flexDirection: 'row',
+    justifyContent: 'center',
     paddingTop: 10,
     gap:30
   },

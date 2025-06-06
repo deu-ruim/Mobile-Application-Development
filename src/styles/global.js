@@ -38,7 +38,6 @@ export const GlobalStyles = StyleSheet.create({
     fontWeight: 'semibold',
     fontSize: 25,
     textAlign: 'center',  
-    
   },
   textinho: {
     fontFamily: 'Lemon-Regular',
@@ -85,5 +84,11 @@ export const GlobalStyles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 10,
     gap:30
+  },
+  git: {
+    backgroundColor: '#2F2F2F',
+    padding: 20,
+    borderRadius: 20,
+    borderColor: '#fff',
   },
 });

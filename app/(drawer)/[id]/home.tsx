@@ -49,24 +49,26 @@ export default function Home() {
   }
 
   return (
-    <ScrollView>
+    <ScrollView style={GlobalStyles.somos}>
       <View>
-        <Text> Seja Bem-vindo, {usuario.username}!</Text>
+        <Text style={[GlobalStyles.textSomos, { color: 'white', }]}> Seja Bem-vindo, {usuario.username}!</Text>
       </View>
-      <View>
-        <Text>Dados metereologicos e etc</Text>
-      </View>
-      <View>
-        <Text>
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        </Text>
-      </View>
-      <View>
+      <View style={[{ flex:1, gap: 10, paddingVertical: 40 }]}>
         <View>
-          <Text>Conheça nosso Github</Text>
-          <Text>Projeto realizado para a Global solution da Fiap</Text>
+          <Text style={[GlobalStyles.textinho, { color: 'white', }]}>Dados metereologicos e etc</Text>
+        </View>
+        <View>
+          <Text style={[GlobalStyles.textinho, { color: 'white', paddingVertical: 20 }]}>
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+          </Text>
+        </View>
+        <View>
+      </View>
+        <View style={[GlobalStyles.git, {  }]}>
+          <Text style={[GlobalStyles.textinho, { color: 'white', fontSize: 20, }]}>Conheça nosso Github</Text>
+          <Text style={[GlobalStyles.textinho, { color: '#494949', fontSize: 15, width:200, textAlign: 'center' }]}>Projeto realizado para a Global solution da Fiap</Text>
           <TouchableOpacity onPress={() => Linking.openURL('https://github.com/deu-ruim')}>
-            <Text>Deu Ruim!</Text>
+            <Text style={[GlobalStyles.textinho, { color: '#EA003D', fontSize: 15, textAlign: 'center' }]}>Deu Ruim!</Text>
           </TouchableOpacity>
         </View>
       </View>

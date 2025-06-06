@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Alert, Image, TouchableOpacity, Linking} from '
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { GlobalStyles } from '../../src/styles/global.js' 
 
 export default function Home() {
   useEffect(() => {

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Alert, Image, TouchableOpacity, Linking} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-
 import { router } from 'expo-router';
 
 export default function Home() {

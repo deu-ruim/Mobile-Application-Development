@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.tsx (exemplo)
 import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
@@ -13,6 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<Usuario>;
   logout: () => void;
+  updateUser: (updatedFields: Partial<Usuario>) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -39,23 +41,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<Usuario> => {
     const response = await api.post('/usuarios/login', { email, password });
     const { token } = response.data;
-    
+
     if (!token) throw new Error('Token não retornado.');
-    
+
     const decoded: JwtUser = jwtDecode(token);
     const userId = decoded.id;
-    
-    applyToken(token); 
+
+    applyToken(token);
     setTokenState(token);
-    
+
     const userResponse = await api.get(`/usuarios/${userId}`);
     const usuarioCompleto: Usuario = userResponse.data;
-    
+
     await AsyncStorage.setItem('@token', token);
     await AsyncStorage.setItem('@user', JSON.stringify(usuarioCompleto));
-    
+
     setUser(usuarioCompleto);
-    
+
     return usuarioCompleto;
   };
 
@@ -68,6 +70,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.replace('/');
   };
 
+  const updateUser = async (updatedFields: Partial<Usuario>) => {
+    if (!user || !token) return;
+
+    try {
+      const response = await api.patch(
+        `/usuarios/${user.id}`,
+        updatedFields,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const updatedUser: Usuario = response.data;
+      setUser(updatedUser);
+      await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao atualizar dados do usuário.');
+      console.error(error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -76,6 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!user && !!token,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}

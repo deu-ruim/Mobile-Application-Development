@@ -23,7 +23,7 @@ export default function Alerta() {
   const [loadingUsuario, setLoadingUsuario] = useState(true);
   const [desastres, setDesastres] = useState<Desastre[]>([]);
   const [carregandoDesastres, setCarregandoDesastres] = useState(true);
-  const [expandido, setExpandido] = useState<number | null>(null); // id do card expandido
+  const [expandido, setExpandido] = useState<number | null>(null); 
 
   useEffect(() => {
     async function fetchUsuario() {

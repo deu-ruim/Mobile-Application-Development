@@ -3,8 +3,6 @@ import { router } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { GlobalStyles } from '../src/styles/global';
 
-
-
 export default function Index() {
 
   const [fontsLoaded] = useFonts({

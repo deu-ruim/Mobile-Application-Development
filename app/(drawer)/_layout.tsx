@@ -58,6 +58,7 @@ export default function DrawerLayout() {
       <Drawer.Screen name='[id]/alerta' options={{ title: 'Alerta' }} />
       <Drawer.Screen name='[id]/home' options={{ title: 'Home' }} />
       <Drawer.Screen name="sair" options={{ title: 'Sair' }} />
+      <Drawer.Screen name="[id]/atualizar" options={{ title: 'Atualizar', drawerItemStyle: { display: 'none' }}} />
     </Drawer>
   );
 }

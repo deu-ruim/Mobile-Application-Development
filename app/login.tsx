@@ -1,10 +1,18 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { isAxiosError } from 'axios';
 import { AuthContext } from '../src/context/AuthContext';
-import { GlobalStyles } from '../src/styles/global';
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -20,9 +28,8 @@ export default function Login() {
     }
 
     try {
-      
       setLoading(true);
-      const user = await login(email, senha); 
+      const user = await login(email, senha);
       Alert.alert('Sucesso', 'Login realizado!');
       router.replace(`/${user.id}/home`);
     } catch (error) {
@@ -39,17 +46,21 @@ export default function Login() {
   }
 
   return (
-    <ScrollView style={GlobalStyles.formulario}>
-      <TouchableOpacity onPress={() => router.push('/')}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      keyboardShouldPersistTaps="handled"
+    >
+      <TouchableOpacity onPress={() => router.push('/')} style={styles.backButton}>
         <Ionicons name="chevron-back-outline" size={40} color="#EA003D" />
       </TouchableOpacity>
 
-      <Text style={GlobalStyles.textForms}>Olá, seja bem-vindo(a) de volta!</Text>
-      <Text style={GlobalStyles.textForms}>Login</Text>
+      <Text style={styles.welcomeText}>Olá, seja bem-vindo(a) de volta!</Text>
+      <Text style={styles.title}>Login</Text>
 
       <TextInput
         placeholder="Email"
-        style={GlobalStyles.caixa}
+        style={styles.input}
         placeholderTextColor="#4D4D4D"
         value={email}
         onChangeText={setEmail}
@@ -57,34 +68,126 @@ export default function Login() {
         autoCapitalize="none"
       />
 
-      <View style={[GlobalStyles.caixa, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+      <View style={styles.passwordContainer}>
         <TextInput
           placeholder="Senha"
-          style={[{ fontSize: 20, }]}
-          value={senha}
+          style={styles.passwordInput}
           placeholderTextColor="#4D4D4D"
+          value={senha}
           onChangeText={setSenha}
           secureTextEntry={!showPassword}
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} >
-          <Ionicons style={[{ justifyContent:'center', padding:10 }]} name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
+        <TouchableOpacity
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeButton}
+        >
+          <Ionicons
+            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+            size={24}
+            color="gray"
+          />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={GlobalStyles.botao} onPress={handleLogin} disabled={loading}>
+      <TouchableOpacity
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={handleLogin}
+        disabled={loading}
+      >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={[GlobalStyles.text, { color: 'white' }]}>Logar</Text>
+          <Text style={styles.buttonText}>Logar</Text>
         )}
       </TouchableOpacity>
 
-      <View style={[{ flexDirection: 'row', paddingLeft: 40, paddingTop: 20 }]}>
-        <Text style={[GlobalStyles.textinho, { color: 'white' }]}>Você não tem conta?</Text>
+      <View style={styles.registerRedirect}>
+        <Text style={styles.textLight}>Você não tem conta?</Text>
         <TouchableOpacity onPress={() => router.push('/cadastro')}>
-          <Text style={[GlobalStyles.textinho, { color: '#EA003D' }]}> Cadastre-se</Text>
+          <Text style={styles.linkText}> Cadastre-se</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#262626',
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  contentContainer: {
+    paddingTop: 40,
+    paddingBottom: 80,
+  },
+  backButton: {
+    marginBottom: 20,
+  },
+  welcomeText: {
+    color: 'white',
+    fontSize: 20,
+    marginBottom: 8,
+  },
+  title: {
+    color: 'white',
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 30,
+  },
+  input: {
+    backgroundColor: '#424242',
+    borderRadius: 40,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 20,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#424242',
+    borderRadius: 40,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 20,
+    color: 'white',
+  },
+  eyeButton: {
+    paddingLeft: 10,
+  },
+  button: {
+    backgroundColor: '#EA003D',
+    paddingVertical: 20,
+    borderRadius: 40,
+    alignItems: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: '600',
+  },
+  registerRedirect: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 30,
+    paddingLeft: 8,
+  },
+  textLight: {
+    color: '#AAAAAA',
+    fontSize: 16,
+  },
+  linkText: {
+    color: '#EA003D',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

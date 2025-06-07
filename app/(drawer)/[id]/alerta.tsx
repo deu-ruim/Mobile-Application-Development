@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, LayoutAnimation} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  LayoutAnimation,
+  StyleSheet,
+} from 'react-native';
 import api from '../../../src/api/api';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Desastre } from '../../../src/types/desastre';
 import { Ionicons } from '@expo/vector-icons';
-
 
 interface Usuario {
   id: number;
@@ -16,7 +24,8 @@ interface Usuario {
   role?: string;
 }
 
-const SEVERIDADES = [
+// Chaves originais para filtro e requisição
+const SEVERIDADES_KEYS = [
   'NON_DESTRUCTIVE',
   'LOW',
   'MODERATE',
@@ -24,6 +33,16 @@ const SEVERIDADES = [
   'CRITICAL',
   'CATASTROPHIC',
 ] as const;
+
+// Mapeamento para exibir em português
+const SeveridadeMap: Record<string, string> = {
+  NON_DESTRUCTIVE: 'NÃO DESTRUTIVO',
+  LOW: 'BAIXA',
+  MODERATE: 'MODERADA',
+  HIGH: 'ALTA',
+  CRITICAL: 'CRÍTICA',
+  CATASTROPHIC: 'CATASTRÓFICA',
+};
 
 export default function Alerta() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -70,10 +89,18 @@ export default function Alerta() {
       try {
         const token = await AsyncStorage.getItem('@token');
 
-        // Monta a query string com uf e severidade se tiver filtro
-        let url = `/desastres?uf=${usuario.uf}`;
-        if (filtroSeveridade) {
-          url += `&severidade=${filtroSeveridade}`;
+        let url = '/desastres';
+        if (usuario.role !== 'ADMIN') {
+          // Usuário normal filtra por UF
+          url += `?uf=${usuario.uf}`;
+          if (filtroSeveridade) {
+            url += `&severidade=${filtroSeveridade}`;
+          }
+        } else {
+          // ADMIN filtra só por severidade (todos os UF)
+          if (filtroSeveridade) {
+            url += `?severidade=${filtroSeveridade}`;
+          }
         }
 
         const resposta = await api.get(url, {
@@ -106,7 +133,7 @@ export default function Alerta() {
       'Confirmar exclusão',
       'Tem certeza que deseja excluir este desastre?',
       [
-        { text: 'Cancelar'},
+        { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Excluir',
           onPress: async () => {
@@ -123,6 +150,7 @@ export default function Alerta() {
               console.error(error);
             }
           },
+          style: 'destructive',
         },
       ]
     );
@@ -130,86 +158,264 @@ export default function Alerta() {
 
   if (loadingUsuario || carregandoDesastres) {
     return (
-      <View>
-        <ActivityIndicator size="large" color="red" />
-        <Text>Carregando dados...</Text>
-      </View>
-    );
-  }
-
-  if (desastres.length === 0) {
-    return (
-      <View>
-        {usuario?.role === 'ADMIN' && (
-          <TouchableOpacity onPress={() => router.push('../../criarDesastre')}>
-            <Text>Criar um desastre</Text>
-          </TouchableOpacity>
-        )}
-        <Text>Nenhum desastre encontrado na região de {usuario?.uf}.</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#EA003D" />
+        <Text style={styles.loadingText}>Carregando dados...</Text>
       </View>
     );
   }
 
   return (
-    <View>
-      <Text>Alerta!!!</Text>
-      <Text>Desastres da região {usuario?.uf}</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Alerta!!!</Text>
+      <Text style={styles.subHeader}>
+        {usuario?.role === 'ADMIN'
+          ? 'Desastres em todas as regiões'
+          : `Desastres da região ${usuario?.uf}`}
+      </Text>
 
-      {usuario?.role === 'ADMIN' && (
-        <TouchableOpacity onPress={() => router.push('../../criarDesastre')}>
-          <Text>Criar Desastre</Text>
+      <TouchableOpacity
+        style={styles.cadastrarButton}
+        onPress={() => router.push('../../criarDesastre')}
+      >
+        <Text style={styles.cadastrarButtonText}>Cadastrar Desastre</Text>
+      </TouchableOpacity>
+
+      {/* FILTROS SEMPRE VISÍVEIS */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            filtroSeveridade === null && styles.filterButtonSelected,
+          ]}
+          onPress={() => setFiltroSeveridade(null)}
+        >
+          <Text
+            style={[
+              styles.filterButtonText,
+              filtroSeveridade === null && styles.filterButtonTextSelected,
+            ]}
+          >
+            Todos
+          </Text>
         </TouchableOpacity>
-      )}
 
-      <View>
-        <TouchableOpacity onPress={() => setFiltroSeveridade(null)}>
-          <Text>Todos</Text>
-        </TouchableOpacity>
-
-        {SEVERIDADES.map((sev) => (
+        {SEVERIDADES_KEYS.map((sev) => (
           <TouchableOpacity
             key={sev}
-            onPress={() => setFiltroSeveridade(sev)}>
-            <Text>{sev}</Text>
+            style={[
+              styles.filterButton,
+              filtroSeveridade === sev && styles.filterButtonSelected,
+            ]}
+            onPress={() => setFiltroSeveridade(sev)}
+          >
+            <Text
+              style={[
+                styles.filterButtonText,
+                filtroSeveridade === sev && styles.filterButtonTextSelected,
+              ]}
+            >
+              {SeveridadeMap[sev]}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <FlatList
-        data={desastres}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => {
-          const aberto = expandido === item.id;
+      {/* Mensagem ou lista de desastres */}
+      {desastres.length === 0 ? (
+        <Text style={styles.noDataText}>
+          Nenhum desastre encontrado {usuario?.role === 'ADMIN' ? '' : `na região de ${usuario?.uf}`}.
+        </Text>
+      ) : (
+        <FlatList
+          data={desastres}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => {
+            const aberto = expandido === item.id;
 
-          return (
-            <TouchableOpacity onPress={() => toggleExpandir(item.id)}>
-              <View>
-                <Ionicons name="earth-outline" size={40} color="red" />
-                <Text>{item.titulo}</Text>
-                <Ionicons name="warning-outline" size={40} color="red" />
-                <Text>{item.severidade}</Text>
-              </View>
-
-              {aberto && (
-                <View>
-                  <Ionicons name="chatbubble-ellipses-outline" size={40} color="red" />
-                  <Text>Descrição: {item.descricao}</Text>
-                  <Ionicons name="calendar-outline" size={40} color="red" />
-                  <Text>Criado em: {new Date(item.createdAt).toLocaleString()}</Text>
-                  <Ionicons name="person-circle-outline" size={40} color="red" />
-                  <Text>Feito por: {item.usuario.username}</Text>
-
-                  {usuario?.role === 'ADMIN' && (
-                    <TouchableOpacity onPress={() => handleExcluirDesastre(item.id)}>
-                      <Ionicons name="trash-outline" size={30} color="red" />
-                    </TouchableOpacity>
-                  )}
+            return (
+              <TouchableOpacity
+                onPress={() => toggleExpandir(item.id)}
+                style={styles.desastreCard}
+                activeOpacity={0.8}
+              >
+                <View style={styles.desastreHeader}>
+                  <Ionicons name="earth-outline" size={30} color="#EA003D" />
+                  <Text style={styles.desastreTitulo}>{item.titulo}</Text>
+                  <Ionicons name="warning-outline" size={30} color="#EA003D" />
+                  <Text style={styles.desastreSeveridade}>{SeveridadeMap[item.severidade]}</Text>
                 </View>
-              )}
-            </TouchableOpacity>
-          );
-        }}
-      />
+
+                {aberto && (
+                  <View style={styles.desastreDetalhes}>
+                    <View style={styles.detalheRow}>
+                      <Ionicons
+                        name="chatbubble-ellipses-outline"
+                        size={20}
+                        color="#EA003D"
+                      />
+                      <Text style={styles.detalheText}>Descrição: {item.descricao}</Text>
+                    </View>
+                    <View style={styles.detalheRow}>
+                      <Ionicons name="calendar-outline" size={20} color="#EA003D" />
+                      <Text style={styles.detalheText}>
+                        Criado em: {new Date(item.createdAt).toLocaleString()}
+                      </Text>
+                    </View>
+                    <View style={styles.detalheRow}>
+                      <Ionicons name="person-circle-outline" size={20} color="#EA003D" />
+                      <Text style={styles.detalheText}>Feito por: {item.usuario.username}</Text>
+                    </View>
+
+                    {usuario?.role === 'ADMIN' && (
+                      <TouchableOpacity
+                        style={styles.excluirButton}
+                        onPress={() => handleExcluirDesastre(item.id)}
+                      >
+                        <Ionicons name="trash-outline" size={24} color="white" />
+                        <Text style={styles.excluirButtonText}>Excluir</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        />
+      )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#262626', // fundo escuro
+    padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#262626',
+  },
+  loadingText: {
+    marginTop: 12,
+    color: 'white',
+    fontSize: 16,
+  },
+  header: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#EA003D',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subHeader: {
+    fontSize: 16,
+    color: '#ccc',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  cadastrarButton: {
+    backgroundColor: '#EA003D',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  cadastrarButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 18,
+  },
+  noDataText: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  filterButton: {
+    backgroundColor: '#3a3a3a',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    marginHorizontal: 4,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  filterButtonSelected: {
+    backgroundColor: '#EA003D',
+  },
+  filterButtonText: {
+    color: '#ccc',
+    fontWeight: '600',
+  },
+  filterButtonTextSelected: {
+    color: 'white',
+    fontWeight: '700',
+  },
+  desastreCard: {
+    backgroundColor: '#3a3a3a',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
+  },
+  desastreHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  desastreTitulo: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 18,
+    flex: 1,
+  },
+  desastreSeveridade: {
+    color: '#EA003D',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  desastreDetalhes: {
+    marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#555',
+    paddingTop: 10,
+  },
+  detalheRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 6,
+  },
+  detalheText: {
+    color: 'white',
+    fontSize: 14,
+    flexShrink: 1,
+  },
+  excluirButton: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EA003D',
+    borderRadius: 8,
+    paddingVertical: 8,
+    gap: 6,
+  },
+  excluirButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+});

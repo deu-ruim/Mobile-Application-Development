@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { isAxiosError } from 'axios';
-import api from '../src/api/api'; 
-import { GlobalStyles } from '../src/styles/global';
+import api from '../src/api/api';
 
 const UFS = [
   { sigla: 'AC', nome: 'Acre' },
@@ -86,98 +93,208 @@ export default function Cadastro() {
   }
 
   return (
-    <ScrollView style={GlobalStyles.formulario} keyboardShouldPersistTaps="handled">
-      <View>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 100 }}>
+      <View style={styles.backButton}>
         <TouchableOpacity onPress={() => router.push('/')}>
           <Ionicons name="chevron-back-outline" size={40} color="#EA003D" />
         </TouchableOpacity>
       </View>
 
-      <View>
-        <Text style={GlobalStyles.textForms}>Olá, Seja bem-vindo(a)</Text>
-        <Text style={GlobalStyles.textForms}>Cadastro</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Olá, Seja bem-vindo(a)</Text>
+        <Text style={styles.title}>Cadastro</Text>
       </View>
 
-      <View>
+      <View style={styles.form}>
         <TextInput
           placeholder="Username"
-          style={GlobalStyles.caixa}
-          placeholderTextColor="#4D4D4D"
+          style={styles.input}
+          placeholderTextColor="#AAAAAA"
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
         />
         <TextInput
           placeholder="Email"
-          style={GlobalStyles.caixa}
-          placeholderTextColor="#4D4D4D"
+          style={styles.input}
+          placeholderTextColor="#AAAAAA"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        <View style={[GlobalStyles.caixa, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+        <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Password"
-            style={[{ fontSize: 20 }]}
-            placeholderTextColor="#4D4D4D"
+            style={styles.passwordInput}
+            placeholderTextColor="#AAAAAA"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
             <Ionicons
-              style={[{ justifyContent: 'center', padding: 10 }]}
               name={showPassword ? 'eye-outline' : 'eye-off-outline'}
               size={24}
-              color="gray"
+              color="white"
             />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={toggleDropdown}
-          style={[GlobalStyles.caixa, { justifyContent: 'center' }]}
-        >
-          <Text style={{ color: uf ? '#000' : '#999' }}>
+        <TouchableOpacity onPress={toggleDropdown} style={styles.dropdown}>
+          <Text style={[styles.dropdownText, { color: uf ? 'white' : '#999' }]}>
             {uf ? UFS.find((item) => item.sigla === uf)?.nome : 'Selecione o estado'}
           </Text>
           <Ionicons
             name={ufDropdownOpen ? 'chevron-up-outline' : 'chevron-down-outline'}
             size={20}
-            color="#333"
+            color="white"
           />
         </TouchableOpacity>
 
         {ufDropdownOpen && (
-          <ScrollView nestedScrollEnabled={true}>
+          <ScrollView
+            style={styles.dropdownList}
+            nestedScrollEnabled={true}
+          >
             {UFS.map((item) => (
               <TouchableOpacity
                 key={item.sigla}
-                onPress={() => selecionarUf(item.sigla)}>
-                <Text>
-                  {item.nome}
-                </Text>
+                onPress={() => selecionarUf(item.sigla)}
+                style={[
+                  styles.dropdownItem,
+                  uf === item.sigla && styles.dropdownItemSelected,
+                ]}
+              >
+                <Text style={styles.dropdownItemText}>{item.nome}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         )}
 
         <TouchableOpacity
-          style={[GlobalStyles.botao, { marginTop: 150 }]}
+          style={styles.button}
           onPress={handleCadastrar}
         >
-          <Text style={[GlobalStyles.text, { color: 'white' }]}>Cadastrar</Text>
+          <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
 
-        <View style={{ flexDirection: 'row', paddingLeft: 70, paddingTop: 20 }}>
-          <Text style={[GlobalStyles.textinho, { color: 'white' }]}>Você já tem conta?</Text>
+        <View style={styles.loginRedirect}>
+          <Text style={styles.text}>Você já tem conta?</Text>
           <TouchableOpacity onPress={() => router.push('/login')}>
-            <Text style={[GlobalStyles.textinho, { color: '#EA003D' }]}> Logar</Text>
+            <Text style={styles.link}> Logar</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#262626',
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+  },
+  backButton: {
+    marginBottom: 20,
+  },
+  header: {
+    marginBottom: 40,
+  },
+  title: {
+    color: 'white',
+    fontSize: 26,
+    fontWeight: '600',
+  },
+  form: {
+    flex: 1,
+  },
+  input: {
+    backgroundColor: '#424242',
+    color: 'white',
+    borderRadius: 40,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#424242',
+    borderRadius: 40,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 18,
+    color: 'white',
+  },
+  eyeButton: {
+    paddingLeft: 10,
+  },
+  dropdown: {
+    backgroundColor: '#424242',
+    borderRadius: 40,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  dropdownText: {
+    fontSize: 18,
+  },
+  dropdownList: {
+    maxHeight: 180,
+    backgroundColor: '#2F2F2F',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#4D4D4D',
+    marginBottom: 20,
+  },
+  dropdownItem: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  dropdownItemSelected: {
+    backgroundColor: '#3D3D3D',
+  },
+  dropdownItemText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#EA003D',
+    paddingVertical: 20,
+    borderRadius: 40,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: '600',
+  },
+  loginRedirect: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  text: {
+    color: '#AAAAAA',
+    fontSize: 16,
+  },
+  link: {
+    color: '#EA003D',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

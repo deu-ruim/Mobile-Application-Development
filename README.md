@@ -2,4 +2,4 @@
 
 ## Link do Vídeo:
 
-https://youtu.be/QSoWpLPEJmM
+https://youtu.be/U7RFmgZJ19Y

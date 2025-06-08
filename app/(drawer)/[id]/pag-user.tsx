@@ -10,8 +10,7 @@ import {
   Modal,
   TextInput,
   Button,
-  StyleSheet,
-} from 'react-native';
+  StyleSheet} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import api from '../../../src/api/api';
@@ -24,8 +23,7 @@ export default function PagUser() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminSenha, setAdminSenha] = useState('');
+  const [senha, setSenha] = useState('');
 
   useEffect(() => {
     async function fetchUsuario() {
@@ -51,44 +49,46 @@ export default function PagUser() {
   }, [user, token]);
 
   const handleConfirmarRole = async () => {
-    if (!adminEmail || !adminSenha) {
-      Alert.alert('Erro', 'Informe email e senha do administrador.');
+    if (!senha) {
+      Alert.alert('Erro', 'Informe sua senha para confirmar.');
+      return;
+    }
+
+    if (!usuario || !usuario.id) {
+      Alert.alert('Erro', 'Usuário inválido ou não carregado.');
       return;
     }
 
     try {
       const loginResponse = await api.post('/usuarios/login', {
-        email: adminEmail,
-        password: adminSenha,
+        email: usuario.email,
+        password: senha,
       });
 
-      const { token: adminToken } = loginResponse.data;
-
-      const decodedAdmin = await api.get('/usuarios/me', {
-        headers: { Authorization: `Bearer ${adminToken}` },
-      });
-
-      if (decodedAdmin.data.role !== 'ADMIN') {
-        Alert.alert('Erro', 'A conta usada não possui permissão de administrador.');
-        return;
-      }
+      const { token: newToken } = loginResponse.data;
 
       await api.put(
-        `/usuarios/${user?.id}`,
-        { role: 'ADMIN' },
+        `/usuarios/${usuario.id}`,
         {
-          headers: { Authorization: `Bearer ${adminToken}` },
+          id: usuario.id,
+          email: usuario.email,
+          username: usuario.username,
+          uf: usuario.uf,
+          role: 'ADMIN',
+          ativo: usuario.ativo ?? true,
+        },
+        {
+          headers: { Authorization: `Bearer ${newToken}` },
         }
       );
 
       setUsuario(prev => (prev ? { ...prev, role: 'ADMIN' } : prev));
       Alert.alert('Sucesso', 'Sua role foi alterada para ADMIN!');
       setModalVisible(false);
-      setAdminEmail('');
-      setAdminSenha('');
+      setSenha('');
     } catch (err: any) {
-      console.error(err);
-      Alert.alert('Erro', 'Não foi possível alterar a role. Verifique os dados.');
+      console.error('Erro ao alterar role:', err.response?.data || err.message || err);
+      Alert.alert('Erro', 'Senha inválida ou não foi possível alterar a role.');
     }
   };
 
@@ -136,26 +136,17 @@ export default function PagUser() {
         <Text style={styles.value}>{usuario.role}</Text>
       </View>
 
-      <TouchableOpacity
-        style={styles.updateButton}
-        onPress={() => router.push('./atualizar')}
-      >
+      <TouchableOpacity style={styles.updateButton} onPress={() => router.push('./atualizar')}>
         <Text style={styles.updateButtonText}>Atualizar Dados</Text>
       </TouchableOpacity>
 
       {usuario.role !== 'ADMIN' && (
-        <TouchableOpacity
-          style={styles.adminButton}
-          onPress={() => setModalVisible(true)}
-        >
+        <TouchableOpacity style={styles.adminButton} onPress={() => setModalVisible(true)}>
           <Text style={styles.adminButtonText}>Alterar role para ADMIN</Text>
         </TouchableOpacity>
       )}
 
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={() => router.push('../sair')}
-      >
+      <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('../sair')}>
         <Ionicons name="log-out-outline" size={24} color="white" />
         <Text style={styles.logoutText}>Sair</Text>
       </TouchableOpacity>
@@ -163,25 +154,15 @@ export default function PagUser() {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Confirmação de administrador</Text>
+            <Text style={styles.modalTitle}>Confirmação de senha</Text>
 
             <TextInput
               style={styles.modalInput}
-              placeholder="Email do admin"
-              placeholderTextColor="#666"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={adminEmail}
-              onChangeText={setAdminEmail}
-            />
-
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Senha do admin"
+              placeholder="Digite sua senha"
               placeholderTextColor="#666"
               secureTextEntry
-              value={adminSenha}
-              onChangeText={setAdminSenha}
+              value={senha}
+              onChangeText={setSenha}
             />
 
             <View style={styles.modalButtons}>
@@ -191,17 +172,12 @@ export default function PagUser() {
                   color="#888"
                   onPress={() => {
                     setModalVisible(false);
-                    setAdminEmail('');
-                    setAdminSenha('');
+                    setSenha('');
                   }}
                 />
               </View>
               <View style={styles.modalButtonWrapper}>
-                <Button
-                  title="Confirmar"
-                  color="#EA003D"
-                  onPress={handleConfirmarRole}
-                />
+                <Button title="Confirmar" color="#EA003D" onPress={handleConfirmarRole} />
               </View>
             </View>
           </View>
@@ -212,63 +188,18 @@ export default function PagUser() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#262626',
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 24,
-    paddingBottom: 60,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#262626',
-  },
-  loadingText: {
-    color: '#EA003D',
-    marginTop: 10,
-    fontSize: 18,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#262626',
-  },
-  errorText: {
-    color: '#EA003D',
-    fontSize: 18,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  greeting: {
-    fontSize: 26,
-    color: 'white',
-    marginBottom: 12,
-  },
-  userImage: {
-    width: 150,
-    height: 150,
-    resizeMode: 'contain',
-  },
-  infoBox: {
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  label: {
-    color: '#AAAAAA',
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  value: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '600',
-  },
+  container: { backgroundColor: '#262626', flex: 1 },
+  contentContainer: { padding: 24, paddingBottom: 60 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#262626' },
+  loadingText: { color: '#EA003D', marginTop: 10, fontSize: 18 },
+  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#262626' },
+  errorText: { color: '#EA003D', fontSize: 18 },
+  header: { alignItems: 'center', marginBottom: 40 },
+  greeting: { fontSize: 26, color: 'white', marginBottom: 12 },
+  userImage: { width: 150, height: 150, resizeMode: 'contain' },
+  infoBox: { marginBottom: 20, paddingHorizontal: 10 },
+  label: { color: '#AAAAAA', fontSize: 16, marginBottom: 4 },
+  value: { color: 'white', fontSize: 20, fontWeight: '600' },
   updateButton: {
     backgroundColor: '#EA003D',
     paddingVertical: 14,
@@ -276,11 +207,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 10,
   },
-  updateButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-  },
+  updateButtonText: { color: 'white', fontSize: 18, fontWeight: '600' },
   adminButton: {
     backgroundColor: '#424242',
     paddingVertical: 14,
@@ -288,39 +215,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 10,
   },
-  adminButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 30,
-    gap: 8,
-  },
-  logoutText: {
-    color: 'white',
-    fontSize: 18,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  modalContainer: {
-    backgroundColor: '#333',
-    borderRadius: 12,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    color: 'white',
-    marginBottom: 20,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
+  adminButtonText: { color: 'white', fontSize: 18, fontWeight: '600' },
+  logoutButton: { flexDirection: 'row', alignItems: 'center', marginTop: 30, gap: 8 },
+  logoutText: { color: 'white', fontSize: 18 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', paddingHorizontal: 24 },
+  modalContainer: { backgroundColor: '#333', borderRadius: 12, padding: 20 },
+  modalTitle: { fontSize: 20, color: 'white', marginBottom: 20, textAlign: 'center', fontWeight: '600' },
   modalInput: {
     backgroundColor: '#424242',
     borderRadius: 40,
@@ -330,12 +230,6 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 16,
   },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalButtonWrapper: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between' },
+  modalButtonWrapper: { flex: 1, marginHorizontal: 5 },
 });

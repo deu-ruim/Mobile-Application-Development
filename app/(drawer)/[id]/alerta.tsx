@@ -177,7 +177,6 @@ export default function Alerta() {
         <Text style={styles.cadastrarButtonText}>Cadastrar Desastre</Text>
       </TouchableOpacity>
 
-      {/* FILTROS SEMPRE VISÍVEIS */}
       <View style={styles.filterContainer}>
         <TouchableOpacity
           style={[
@@ -217,7 +216,6 @@ export default function Alerta() {
         ))}
       </View>
 
-      {/* Mensagem ou lista de desastres */}
       {desastres.length === 0 ? (
         <Text style={styles.noDataText}>
           Nenhum desastre encontrado {usuario?.role === 'ADMIN' ? '' : `na região de ${usuario?.uf}`}.

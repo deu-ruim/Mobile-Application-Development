@@ -56,9 +56,9 @@ export default function DrawerLayout() {
       screenOptions={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#1C1C1C', // Fundo escuro do header
+          backgroundColor: '#1C1C1C', 
         },
-        headerTintColor: 'white', // Texto branco no header
+        headerTintColor: 'white',
         drawerStyle: styles.drawer,
         drawerLabelStyle: styles.label,
         drawerActiveBackgroundColor: '#333333',
@@ -74,7 +74,7 @@ export default function DrawerLayout() {
         name="sair" 
         options={{ 
           title: 'Sair',
-          drawerLabelStyle: { color: '#EA003D', fontWeight: 'bold' }, // Sair em vermelho
+          drawerLabelStyle: { color: '#EA003D', fontWeight: 'bold' },
         }} 
       />
       <Drawer.Screen name="[id]/atualizar" options={{ title: 'Atualizar', drawerItemStyle: { display: 'none' }}} />
@@ -84,7 +84,7 @@ export default function DrawerLayout() {
 
 const styles = StyleSheet.create({
   drawer: {
-    backgroundColor: '#1C1C1C', // Fundo do drawer escuro
+    backgroundColor: '#1C1C1C', 
   },
   label: {
     color: 'white',

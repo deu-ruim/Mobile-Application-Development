@@ -24,7 +24,6 @@ interface Usuario {
   role?: string;
 }
 
-// Chaves originais para filtro e requisição
 const SEVERIDADES_KEYS = [
   'NON_DESTRUCTIVE',
   'LOW',
@@ -34,7 +33,6 @@ const SEVERIDADES_KEYS = [
   'CATASTROPHIC',
 ] as const;
 
-// Mapeamento para exibir em português
 const SeveridadeMap: Record<string, string> = {
   NON_DESTRUCTIVE: 'NÃO DESTRUTIVO',
   LOW: 'BAIXA',
@@ -91,13 +89,11 @@ export default function Alerta() {
 
         let url = '/desastres';
         if (usuario.role !== 'ADMIN') {
-          // Usuário normal filtra por UF
           url += `?uf=${usuario.uf}`;
           if (filtroSeveridade) {
             url += `&severidade=${filtroSeveridade}`;
           }
         } else {
-          // ADMIN filtra só por severidade (todos os UF)
           if (filtroSeveridade) {
             url += `?severidade=${filtroSeveridade}`;
           }
@@ -291,7 +287,7 @@ export default function Alerta() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#262626', // fundo escuro
+    backgroundColor: '#262626', 
     padding: 16,
   },
   loadingContainer: {

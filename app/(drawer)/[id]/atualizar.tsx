@@ -22,13 +22,16 @@ export default function Atualizar() {
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [showPasswords, setShowPasswords] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleAtualizar = async () => {
+    console.log('--- Tentando atualizar dados ---');
+    console.log('Campos:', { username, email, uf, senhaAtual, novaSenha, confirmarSenha });
+
     if (!username || !email || !uf || !senhaAtual) {
       Alert.alert(
         'Erro',
-        'Todos os campos obrigatórios devem ser preenchidos, incluindo a senha atual.'
+        'Preencha todos os campos obrigatórios, incluindo a senha atual.'
       );
       return;
     }
@@ -39,28 +42,40 @@ export default function Atualizar() {
     }
 
     try {
-      const dadosAtualizados: any = {
+      const senhaParaEnviar = novaSenha || senhaAtual;
+
+      const dadosAtualizados = {
         username,
         email,
         uf,
         ativo: true,
+        role: user?.role || 'USER',
+        password: senhaParaEnviar,
       };
 
-      if (novaSenha) {
-        dadosAtualizados.password = novaSenha;
-      }
+      console.log('Enviando para API:', dadosAtualizados);
 
-      await api.put(`/usuarios/${user?.id}`, dadosAtualizados);
+      const response = await api.put(`/usuarios/${user?.id}`, dadosAtualizados);
+
+      console.log('Resposta da API:', response.status, response.data);
 
       Alert.alert(
         'Sucesso',
-        'Dados atualizados com sucesso!\nÉ preciso logar novamente'
+        'Dados atualizados com sucesso!\nVocê será deslogado para efetuar novo login.'
       );
-      updateUser({ username, email, uf });
-      logout();
+
+      await updateUser({ username, email, uf });
+
+      // Delay maior antes de deslogar para o alerta ser visto
+      setTimeout(() => {
+        console.log('Fazendo logout após atualização');
+        logout();
+      }, 2000); // 2 segundos
     } catch (error: any) {
-      console.error(error);
-      const msg = error.response?.data?.message || 'Erro ao atualizar os dados.';
+      console.error('Erro completo:', error);
+      console.error('Erro response data:', error.response?.data);
+      const msg =
+        error.response?.data?.message || 'Erro ao atualizar os dados.';
       Alert.alert('Erro', msg);
     }
   };
@@ -109,20 +124,16 @@ export default function Atualizar() {
           placeholderTextColor="#999"
           value={senhaAtual}
           onChangeText={setSenhaAtual}
-          secureTextEntry={!showPasswords}
+          secureTextEntry={!showPassword}
         />
-      </View>
-
-      <View style={styles.form}>
-        <Text style={styles.sectionTitle}>Nova senha (opcional)</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Nova senha"
+          placeholder="Nova senha (opcional)"
           placeholderTextColor="#999"
           value={novaSenha}
           onChangeText={setNovaSenha}
-          secureTextEntry={!showPasswords}
+          secureTextEntry={!showPassword}
         />
 
         <TextInput
@@ -131,15 +142,15 @@ export default function Atualizar() {
           placeholderTextColor="#999"
           value={confirmarSenha}
           onChangeText={setConfirmarSenha}
-          secureTextEntry={!showPasswords}
+          secureTextEntry={!showPassword}
         />
 
         <TouchableOpacity
           style={styles.showPasswordBtn}
-          onPress={() => setShowPasswords(!showPasswords)}
+          onPress={() => setShowPassword(!showPassword)}
         >
           <Text style={styles.showPasswordText}>
-            {showPasswords ? 'Ocultar senhas' : 'Mostrar senhas'}
+            {showPassword ? 'Ocultar senhas' : 'Mostrar senhas'}
           </Text>
         </TouchableOpacity>
 
@@ -181,12 +192,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     marginBottom: 20,
-  },
-  sectionTitle: {
-    color: '#EA003D',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
   },
   showPasswordBtn: {
     alignSelf: 'center',

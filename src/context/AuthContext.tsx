@@ -14,7 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<Usuario>;
   logout: () => void;
   updateUser: (updatedFields: Partial<Usuario>) => Promise<void>;
-  setToken: (token: string | null) => void;  
+  setToken: (token: string | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const setToken = (token: string | null) => {
     setTokenState(token);
-    applyToken(token); 
+    applyToken(token);
   };
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const decoded: JwtUser = jwtDecode(token);
     const userId = decoded.id;
 
-    setToken(token); 
+    setToken(token);
 
     const userResponse = await api.get(`/usuarios/${userId}`);
     const usuarioCompleto: Usuario = userResponse.data;
@@ -77,18 +77,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user || !token) return;
 
     try {
-      const response = await api.patch(
+      // Mescla dados atuais do usuário com os campos atualizados
+      const updatedUserData = {
+        ...user,
+        ...updatedFields,
+      };
+
+      console.log('[updateUser] Dados para enviar:', updatedUserData);
+
+      const response = await api.put(
         `/usuarios/${user.id}`,
-        updatedFields,
+        updatedUserData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const updatedUser: Usuario = response.data;
       setUser(updatedUser);
       await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
+      console.log('[updateUser] Atualização bem-sucedida:', updatedUser);
     } catch (error) {
       Alert.alert('Erro', 'Falha ao atualizar dados do usuário.');
-      console.error(error);
+      console.error('[updateUser] Erro:', error);
     }
   };
 

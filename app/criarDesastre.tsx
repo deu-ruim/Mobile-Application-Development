@@ -24,7 +24,6 @@ type Severidade =
   | 'CRITICAL'
   | 'CATASTROPHIC';
 
-// Tipagem explícita para o array severidades
 const severidades: { label: string; value: Severidade }[] = [
   { label: 'Não destrutivo', value: 'NON_DESTRUCTIVE' },
   { label: 'Baixa', value: 'LOW' },

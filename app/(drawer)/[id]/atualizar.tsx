@@ -1,13 +1,5 @@
 import React, { useContext, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, StyleSheet} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { AuthContext } from '../../../src/context/AuthContext';
@@ -66,11 +58,10 @@ export default function Atualizar() {
 
       await updateUser({ username, email, uf });
 
-      // Delay maior antes de deslogar para o alerta ser visto
       setTimeout(() => {
         console.log('Fazendo logout após atualização');
         logout();
-      }, 2000); // 2 segundos
+      }, 2000); 
     } catch (error: any) {
       console.error('Erro completo:', error);
       console.error('Erro response data:', error.response?.data);

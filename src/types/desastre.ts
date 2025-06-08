@@ -1,6 +1,5 @@
 import { Usuario } from "./usuario";
 
-
 export interface Desastre {
   id: number;
   uf: string;

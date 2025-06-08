@@ -77,7 +77,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user || !token) return;
 
     try {
-      // Mescla dados atuais do usuário com os campos atualizados
       const updatedUserData = {
         ...user,
         ...updatedFields,

@@ -17,8 +17,6 @@ export default function Atualizar() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleAtualizar = async () => {
-    console.log('--- Tentando atualizar dados ---');
-    console.log('Campos:', { username, email, uf, senhaAtual, novaSenha, confirmarSenha });
 
     if (!username || !email || !uf || !senhaAtual) {
       Alert.alert(
@@ -45,11 +43,8 @@ export default function Atualizar() {
         password: senhaParaEnviar,
       };
 
-      console.log('Enviando para API:', dadosAtualizados);
-
       const response = await api.put(`/usuarios/${user?.id}`, dadosAtualizados);
 
-      console.log('Resposta da API:', response.status, response.data);
 
       Alert.alert(
         'Sucesso',
@@ -59,7 +54,6 @@ export default function Atualizar() {
       await updateUser({ username, email, uf });
 
       setTimeout(() => {
-        console.log('Fazendo logout após atualização');
         logout();
       }, 2000); 
     } catch (error: any) {

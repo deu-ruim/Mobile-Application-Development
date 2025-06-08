@@ -11,8 +11,8 @@ export default function Index() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.logoContainer}>
-        <Image source={require('../assets/user.png')} style={styles.logo} />
+      <View style={styles.imgContainer}>
+        <Image source={require('../assets/user.png')} style={styles.img} />
       </View>
 
       <Text style={styles.welcome}>Bem vindo ao</Text>
@@ -45,11 +45,11 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     alignItems: 'center',
   },
-  logoContainer: {
+  imgContainer: {
     alignItems: 'center',
     marginBottom: 50,
   },
-  logo: {
+  img: {
     width: 150,
     height: 150,
     resizeMode: 'contain',

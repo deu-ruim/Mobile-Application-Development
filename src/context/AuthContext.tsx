@@ -82,7 +82,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ...updatedFields,
       };
 
-      console.log('[updateUser] Dados para enviar:', updatedUserData);
 
       const response = await api.put(
         `/usuarios/${user.id}`,
@@ -93,7 +92,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const updatedUser: Usuario = response.data;
       setUser(updatedUser);
       await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
-      console.log('[updateUser] Atualização bem-sucedida:', updatedUser);
     } catch (error) {
       Alert.alert('Erro', 'Falha ao atualizar dados do usuário.');
       console.error('[updateUser] Erro:', error);
